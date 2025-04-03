@@ -1,0 +1,39 @@
+
+
+services:
+  postgres_db:
+    image: postgres:15 # Используем актуальную версию PostgreSQL
+    container_name: postgres_analytics_demo
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: web_analytics
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Можно добавить volume для загрузки данных
+      - ./data:/data_load 
+
+  clickhouse_db:
+    image: clickhouse/clickhouse-server:latest # Используем актуальную версию ClickHouse
+    container_name: clickhouse_analytics_demo
+    environment:
+      CLICKHOUSE_USER: user
+      CLICKHOUSE_PASSWORD: password
+      CLICKHOUSE_DB: web_analytics
+    ports:
+      - "8123:8123" # HTTP-интерфейс
+      - "9000:9000" # Нативный TCP-интерфейс
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      # Можно добавить volume для загрузки данных
+      - ./data:/data_load 
+    ulimits: # Рекомендуется для ClickHouse
+      nofile:
+        soft: 262144
+        hard: 262144
+
+volumes:
+  postgres_data:
+  clickhouse_data:
